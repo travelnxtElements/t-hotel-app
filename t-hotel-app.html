@@ -1,5 +1,7 @@
 <link rel="import" href="../polymer/polymer.html"/>
 <link rel="import" href="../t-hotel-search/t-hotel-search-page.html">
+<link rel="import" href="t-hotel-result-page.html">
+<link rel="import" href="../t-header/t-hotel-search-decorator.html">
 
 <!--
 A comment describing this element
@@ -43,9 +45,32 @@ Example:
                 auth-token="[[authToken]]" 
                 api-base-url="[[apiBaseUrl]]"
                 api-url-format="[[apiUrlFormat]]"
-                query-params="{{queryParams}}"
-                on-search-page-success="_goToResult">
+                search-id="{{searchId}}"
+                on-search-page-success="_searchPageSucces">
             </t-hotel-search-page>
+
+            <t-hotel-result-page
+                name="results"
+                auth-token="[[authToken]]" 
+                api-base-url="[[apiBaseUrl]]"
+                site-logo-url="[[siteLogoUrl]]"
+                api-url-format="[[apiUrlFormat]]"
+                filter-icon="bgv:filter"
+                disable-filter-icon="bgv:disable-filter"
+                activity-icon="[[activityIcon]]"
+                hotel-recap-data="[[hotelRecapData]]"
+                search-id="[[searchId]]"
+                search-criteria="{{searchCriteria}}"
+                itinerary="{{selectedItinerary}}"
+                on-hotel-select="_goToRoomList">
+                <t-header icon="[[headerBackIcon]]" url="[[siteUrl]]hotel/" right-icon="maps:place">
+                    <t-header-search-recap recap-data="{{hotelRecapData}}"></t-header-search-recap>
+                    <t-hotel-search-decorator
+                        input="[[searchCriteria]]"
+                        output="{{hotelRecapData}}">
+                    </t-hotel-search-decorator>
+                </t-header>
+            </t-hotel-result-page>
 
         </iron-pages>
     </template>
@@ -165,9 +190,9 @@ Example:
                     });
                 },
 
-                _searchPageSucces: function () {
-                    this.searchCriteria = this.$.searchPage.searchedData;
-                    this._goToCategory();
+                _searchPageSucces: function (e) {
+                    this.searchCriteria = e.detail.data;
+                    this._goToResults();
                 },
 
                 _goToSearch: function (e) {
@@ -176,20 +201,12 @@ Example:
                     document.querySelector('#home-tabs paper-tabs').notifyResize();
                 },
 
-                _goToCategory: function (e) {
-                    this.set('route.path', 'categories');
-
-                    this.headerData = {
-                        normalHeading: false
-                    };
-                },
-
                 _goToResults: function (e) {
                     this.set('route.path', 'results');
                 },
 
-                _goToDetails: function (e) {
-                    this.set('route.path', 'details');
+                _goToRoomList: function (e) {
+                    this.set('route.path', 'rooms');
                 },
 
                 _goToPassengerInfo: function (e) {

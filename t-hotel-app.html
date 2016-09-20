@@ -1,27 +1,213 @@
-<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../polymer/polymer.html"/>
+<link rel="import" href="../t-hotel-search/t-hotel-search-page.html">
 
+<!--
+A comment describing this element
+
+Example:
+
+    <t-hotel-app></t-hotel-app>
+
+Example:
+
+    <t-hotel-app>
+      <h2>Hello t-hotel-app</h2>
+    </t-hotel-app>
+
+@demo demo/index.html
+-->
 <dom-module id="t-hotel-app">
-  <template>
-    <style>
-      :host {
-        display: block;
-      }
-    </style>
-    <h2>Hello [[prop1]]</h2>
-  </template>
+    <template>
+        <style>
+            :host {
+                display: block;
+            }
+            
+            t-header-search-recap {
+                --font-16: 14px;
+                --header-recap-line-height: 16px;
+            }
+        </style>
+        <t-notify id="notify" message="No results found." type="warn"></t-notify>
+        <app-route
+            id="hotelRoute"
+            route="{{route}}" 
+            pattern="/:page" 
+            data="{{routeData}}"
+            tail="{{subroute}}">
+        </app-route>
+        <iron-pages role="main" selected="{{page}}" attr-for-selected="name" selected-attribute="visible">
 
-  <script>
-    Polymer({
+            <t-hotel-search-page
+                name="home" 
+                auth-token="[[authToken]]" 
+                api-base-url="[[apiBaseUrl]]"
+                api-url-format="[[apiUrlFormat]]"
+                query-params="{{queryParams}}"
+                on-search-page-success="_goToResult">
+            </t-hotel-search-page>
 
-      is: 't-hotel-app',
+        </iron-pages>
+    </template>
+    <script>
+        (function () {
 
-      properties: {
-        prop1: {
-          type: String,
-          value: 't-hotel-app',
-        },
-      },
+            Polymer({
+                is: 't-hotel-app',
 
-    });
-  </script>
+                properties: {
+
+                    visible: {
+                        type: Boolean,
+                        value: false,
+                        notify: true
+                    },
+
+                    siteAbsUrl: String,
+
+                    route: {
+                        type: Object,
+                        notify: true
+                    },
+
+                    page: {
+                        type: String,
+                        value: 'home',
+                        reflectToAttribute: true
+                    },
+
+                    hotelIcon: {
+                        type: String,
+                        value: 'maps:directions-hotel'
+                    },
+
+                    successIcon: {
+                        type: String,
+                        value: 'bgv:check-mark'
+                    },
+
+                    selectedItinerary: {
+                        type: Object,
+                        observer: '__updateDetails'
+                    },
+
+                    headerBackIcon: {
+                        type: String,
+                        value: 'bgv:arrow-left'
+                    }
+                },
+
+                listeners: {
+                    'editsearch': '_goToSearch',
+                    'search-page-success': '_searchPageSucces',
+                    'go-to-search': '_goToSearch'
+                },
+
+                observers: [
+                    '__routePageChanged(route.path)'
+                ],
+
+                __routePageChanged: function (path) {
+                    setTimeout(function () {
+                        if (!this.visible || path === undefined || path === null) {
+                            return;
+                        }
+
+                        path = path.replace(/\//g, '');
+
+                        if (this.page && this.page.toLowerCase() === path.toLowerCase()) {
+                            return;
+                        }
+
+                        this.page = path || 'home';
+                        this._setHeaderDataEvent(this.page);
+
+                        // Scroll to the top of the page on every *route* change. Use `Polymer.AppLayout.scroll`
+                        // with `behavior: 'silent'` to disable header scroll effects during the scroll.
+                        Polymer.AppLayout.scroll({
+                            top: 0,
+                            behavior: 'silent'
+                        });
+
+                    }.bind(this), 10);
+                },
+
+                __updateDetails: function () {
+                    this.paxCountMap = this.paxCountMap || {
+                        Adult: 1
+                    };
+                    this.passengerInfo = this.passengerInfo || {
+                        passengerList: [
+                            {
+                                title: "",
+                                type: "Adult",
+                                firstName: "",
+                                lastName: "",
+                                header: ""
+                            }
+                        ],
+                        phone: "",
+                        email: ""
+                    };
+                    this.itineraryId = this.selectedItinerary && this.selectedItinerary.id
+                        ? this.selectedItinerary.id
+                        : 0;
+                },
+
+                //function to trigger event for setting header data
+                _setHeaderDataEvent: function (page) {
+                    if (this.page.toLowerCase() === 'home') {
+                        return;
+                    }
+                    this.fire('t-hotel-route-change', {
+                        searchData: this.searchCriteria,
+
+                    });
+                },
+
+                _searchPageSucces: function () {
+                    this.searchCriteria = this.$.searchPage.searchedData;
+                    this._goToCategory();
+                },
+
+                _goToSearch: function (e) {
+                    this.set('route.path', 'home');
+                    //Patch ATOM-911 to resize the tab underline
+                    document.querySelector('#home-tabs paper-tabs').notifyResize();
+                },
+
+                _goToCategory: function (e) {
+                    this.set('route.path', 'categories');
+
+                    this.headerData = {
+                        normalHeading: false
+                    };
+                },
+
+                _goToResults: function (e) {
+                    this.set('route.path', 'results');
+                },
+
+                _goToDetails: function (e) {
+                    this.set('route.path', 'details');
+                },
+
+                _goToPassengerInfo: function (e) {
+                    this.set('route.path', 'paxInfo');
+                },
+
+                _goToPaymentPage: function (e) {
+                    this.set('route.path', 'payment');
+                },
+
+                _goToConfirmationPage: function (e) {
+                    this.set('route.path', 'confirmation');
+                },
+
+                _goToFailurePage: function (e) {
+                    this.set('route.path', 'failure');
+                }
+            });
+        })();
+    </script>
 </dom-module>

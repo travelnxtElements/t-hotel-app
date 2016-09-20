@@ -1,0 +1,52 @@
+<link rel="import" href="../polymer/polymer.html"/>
+
+<!--
+A comment describing this element
+
+Example:
+
+    <t-hotel-result-page></t-hotel-result-page>
+
+Example:
+
+    <t-hotel-result-page>
+      <h2>Hello t-hotel-result-page</h2>
+    </t-hotel-result-page>
+
+@demo demo/index.html
+-->
+<dom-module id="t-hotel-result-page">
+    <template>
+        <style>
+            :host {
+                display: block;
+            }            
+        </style>
+        <h1>this is hotel result</h1>
+    </template>
+    <script>
+        (function () {
+
+            Polymer({
+
+                is: 't-hotel-result-page',
+
+                behaviors: [
+                    TravelNxt.Behaviors.PageBehavior,
+                    TravelNxt.Behaviors.SessionBehavior
+                ],
+
+                properties: {
+                },
+
+                observers: [
+                    '__pageLoad(visible)',
+                    '__updatePage(searchId)'
+                ],
+
+                listeners: {
+                }
+            });
+        })();
+    </script>
+</dom-module>

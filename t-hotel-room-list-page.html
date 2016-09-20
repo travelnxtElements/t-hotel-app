@@ -1,0 +1,140 @@
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../t-sessionstorage/t-sessionstorage.html">
+<link rel="import" href="../t-list/t-list.html">
+<link rel="import" href="../t-notify/t-notify.html">
+<link rel="import" href="../t-search-overlay/t-search-overlay.html">
+<link rel="import" href="../t-header/t-header-search-recap.html">
+<link rel="import" href="../t-text-container/travel-element-styles.html">
+<link rel="import" href="../t-behavior/t-page-behavior.html">
+<link rel="import" href="../t-behavior/t-session-behavior.html"/>
+
+<!--
+A comment describing this element
+
+Example:
+
+    <t-hotel-room-list-page></t-hotel-room-list-page>
+
+Example:
+
+    <t-hotel-room-list-page>
+      <h2>Hello t-hotel-room-list-page</h2>
+    </t-hotel-room-list-page>
+
+@demo demo/index.html
+-->
+<dom-module id="t-hotel-room-list-page">
+    <template>
+        <style>
+            :host {
+                display: block;
+            }            
+        </style>
+
+        <h1 style="text-align:center;">Room List</h1>
+
+        <t-notify id="notify"></t-notify>
+
+        <content></content>
+
+        <t-sessionstorage
+            id="sessionStore"
+            api-url-format="[[apiUrlFormat]]"
+            on-t-sessionstorage-load-success="_onSessionGet"
+            on-t-sessionstorage-save-success="_onSessionSave">
+        </t-sessionstorage>
+    </template>
+    <script>
+        (function () {
+
+            Polymer({
+
+                is: 't-hotel-room-list-page',
+
+                behaviors: [
+                    TravelNxt.Behaviors.PageBehavior,
+                    TravelNxt.Behaviors.SessionBehavior
+                ],
+
+                properties: {
+                },
+
+                observers: [
+                    '__pageLoad(visible)',
+                    '__updatePage(searchId)'
+                ],
+
+                listeners: {
+                },
+
+                /**
+                 * This is observer method and executed every time `visible` or `searchId` changes
+                 * @param  {String} visible
+                 * @param  {String} searchId
+                 * @return {Void}
+                 */
+                __pageLoad: function (visible) {
+                    if (!visible) {
+                        return;
+                    }
+
+                    // this._syncSession();
+                },
+
+                __updatePage: function (searchId) {
+
+                    if (!searchId) {
+                        this.fire('go-to-search');
+                        return;
+                    }
+
+                    this.$.loadingOverlay.active = true;
+                    this.$.loadingOverlay.value = 0;
+                    this.$.list.generateList();
+                    this.$.list.$.filter.generateFilter();
+                },
+
+                _syncSession: function () {
+                    this._data = [{
+                        key: 'Hotel_Search_Criteria',
+                        propertyName: 'searchCriteria'
+                    },{
+                        key: 'Hotel_Search_Id',
+                        propertyName: 'searchId'
+                    }];
+                    this.getSession();
+                },
+
+                /**
+                 * This is observer method and executed when list is populated in `t-list`
+                 * @return {Void}
+                 */
+                _onListPopulation: function () {
+                    //ending the overlay
+                    this.$.loadingOverlay.value = 100;
+                },
+
+                _onHotelSelection: function (e) {
+                    if (!e || !e.detail) {
+                        return;
+                    }
+
+                    if (!this.itinerary || (this.itinerary.id !== e.detail.id)) {
+
+                        this.itinerary = e.detail;
+
+                        this._data = [{
+                            key: 'Hotel_Itinerary',
+                            propertyName: 'itinerary',
+                            value: this.itinerary
+                        }];
+
+                        this.setSession();
+                    }
+
+                    this.fire('hotel-select', this.itinerary);
+                }
+            });
+        })();
+    </script>
+</dom-module>

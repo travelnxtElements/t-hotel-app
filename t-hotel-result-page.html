@@ -48,9 +48,9 @@ Example:
 
         <t-list 
             id="list"
-            data-api="[[apiBaseUrl]]api/hotel/results/[[searchId]]/rates?$top=20&token=[[authToken]]"
+            data-api="[[apiBaseUrl]]api/hotel/results/[[searchId]]/rates?$top=20&token=[[authToken]]&$select=Id,Name,Rating,Address,StayDuration,Deal,IsPostPaid,MinFare,Fare,HeroImageUrl,Source"
             filter-api="[[apiBaseUrl]]api/hotel/filter/[[searchId]]/rates?token=[[authToken]]"
-            filter-results-api="[[apiBaseUrl]]api/hotel/results/filter/[[searchId]]/rates?$top=20&token=[[authToken]]"
+            filter-results-api="[[apiBaseUrl]]api/hotel/results/filter/[[searchId]]/rates?$top=20&token=[[authToken]]&$select=Id,Name,Rating,Address,StayDuration,Deal,IsPostPaid,MinFare,Fare,HeroImageUrl,Source"
             with-filter
             with-sorting
             filter-search-label="[[filterSearchLabel]]"
@@ -171,7 +171,6 @@ Example:
                         type: Array,
                         value: ['showCategoryCount']
                     }
-
                 },
 
                 observers: [

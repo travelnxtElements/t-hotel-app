@@ -1,6 +1,7 @@
 <link rel="import" href="../polymer/polymer.html"/>
 <link rel="import" href="../t-hotel-search/t-hotel-search-page.html">
 <link rel="import" href="t-hotel-result-page.html">
+<link rel="import" href="t-hotel-room-list-page.html">
 <link rel="import" href="../t-header/t-hotel-search-decorator.html">
 
 <!--
@@ -57,7 +58,7 @@ Example:
                 api-url-format="[[apiUrlFormat]]"
                 filter-icon="bgv:filter"
                 disable-filter-icon="bgv:disable-filter"
-                activity-icon="[[activityIcon]]"
+                hotel-icon="[[hotelIcon]]"
                 hotel-recap-data="[[hotelRecapData]]"
                 search-id="[[searchId]]"
                 search-criteria="{{searchCriteria}}"
@@ -71,6 +72,35 @@ Example:
                     </t-hotel-search-decorator>
                 </t-header>
             </t-hotel-result-page>
+
+            <t-hotel-room-list-page
+                name="results"
+                auth-token="[[authToken]]" 
+                api-base-url="[[apiBaseUrl]]"
+                site-logo-url="[[siteLogoUrl]]"
+                api-url-format="[[apiUrlFormat]]"
+                filter-icon="bgv:filter"
+                disable-filter-icon="bgv:disable-filter"
+                hotel-icon="[[hotelIcon]]"
+                hotel-recap-data="[[hotelRecapData]]"
+                search-id="[[searchId]]"
+                search-criteria="{{searchCriteria}}"
+                itinerary="{{selectedItinerary}}"
+                on-hotel-select="_goToRoomList">
+                <t-header 
+                    icon="[[headerBackIcon]]" 
+                    url="[[siteUrl]]hotel/results">
+                    <t-header-search-recap 
+                        recap-data="{{hotelRecapData}}" 
+                        hide-edit-icon 
+                        itinerary-name="[[selectedItinerary.name]]">                            
+                    </t-header-search-recap>
+                    <t-hotel-search-decorator
+                        input="[[searchCriteria]]"
+                        output="{{hotelRecapData}}">
+                    </t-hotel-search-decorator>
+                </t-header>
+            </t-hotel-room-list-page>
 
         </iron-pages>
     </template>
@@ -103,7 +133,7 @@ Example:
 
                     hotelIcon: {
                         type: String,
-                        value: 'maps:directions-hotel'
+                        value: 'maps:hotel'
                     },
 
                     successIcon: {

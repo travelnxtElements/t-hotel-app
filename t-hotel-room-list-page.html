@@ -31,8 +31,6 @@ Example:
             }            
         </style>
 
-        <h1 style="text-align:center;">Room List</h1>
-
         <t-notify id="notify"></t-notify>
 
         <content></content>
@@ -78,7 +76,7 @@ Example:
                         return;
                     }
 
-                    // this._syncSession();
+                    this._syncSession();
                 },
 
                 __updatePage: function (searchId) {

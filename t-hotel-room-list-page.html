@@ -8,6 +8,7 @@
 <link rel="import" href="../t-hotel-room-list/t-hotel-room-list.html">
 <link rel="import" href="../t-hotel-room-list/t-hotel-details-tab.html">
 <link rel="import" href="../t-hotel-room-list/t-hotel-room-list-provider.html">
+<link rel="import" href="../iron-flex-layout/iron-flex-layout-classes.html">
 <link rel="import" href="../iron-pages/iron-pages.html">
 <link rel="import" href="../t-text-container/travel-element-styles.html">
 <link rel="import" href="../t-behavior/t-page-behavior.html">
@@ -30,6 +31,8 @@ Example:
 -->
 <dom-module id="t-hotel-room-list-page">
     <template>
+        <style include="iron-flex"></style>
+        <style include="iron-flex-alignment"></style>
         <style include="travel-element-styles">
             :host {
                 display: block;
@@ -80,38 +83,51 @@ Example:
 	        </div>
     	</div>
 
-	    <t-tabs 
-	    	selected="{{activeTab}}" 
-	    	noink 
-	    	inverted 
-	    	alignment="fullbleed">
-	        <t-tab>Rooms</t-tab>
-	        <t-tab>Details</t-tab>    
-	    </t-tabs>
+        <template is="dom-if" if="[[loading]]">
+            <div class="loader-section section-small" id="loaderContainer">
+                <p class="primary-text text-center margin-bottom-medium">
+                    Please do not refresh the page while we are checking for the availability of the rooms...
+                </p>
+                <div class="layout horizontal center-justified">
+                    <t-loader id="loader" active></t-loader>
+                </div>
+            </div>
+        </template>
 
-    	<iron-pages selected="{{activeTab}}">
-        	<div>
-		        <t-hotel-room-list
-		        	rooms="[[itinerary.rooms]]"
-		        	stayDuration="{{itinerary.stayDuration}}">
-		        	<t-hotel-room-policy-provider
-		        		id="policyProvider"
-						api-base-url="[[apiBaseUrl]]"
-						api-relative-url="api/hotel/results/single/policies"
-						auth-token="[[authToken]]"
-			            search-id="[[searchId]]"
-			            itinerary-id="[[itinerary.id]]">
-		        	</t-hotel-room-policy-provider>     
-		    	</t-hotel-room-list> 
-        	</div>
-        	<div>
-		    	<t-hotel-details-tab
-		    		descriptions="[[itinerary.descriptions]]"
-		    		amenities="[[itinerary.amenities]]"
-		    		pointsOfInterest="[[itinerary.pointsOfInterest]]">
-		    	</t-hotel-details-tab>
-        	</div>
-	    </iron-pages>
+        <template is="dom-if" if="[[!loading]]">
+    	    <t-tabs 
+    	    	selected="{{activeTab}}" 
+    	    	noink 
+    	    	inverted 
+    	    	alignment="fullbleed">
+    	        <t-tab>Rooms</t-tab>
+    	        <t-tab>Details</t-tab>    
+    	    </t-tabs>
+
+        	<iron-pages selected="{{activeTab}}">
+            	<div>
+    		        <t-hotel-room-list
+    		        	rooms="[[itinerary.rooms]]"
+    		        	stayDuration="{{itinerary.stayDuration}}">
+    		        	<t-hotel-room-policy-provider
+    		        		id="policyProvider"
+    						api-base-url="[[apiBaseUrl]]"
+    						api-relative-url="api/hotel/results/single/policies"
+    						auth-token="[[authToken]]"
+    			            search-id="[[searchId]]"
+    			            itinerary-id="[[itinerary.id]]">
+    		        	</t-hotel-room-policy-provider>     
+    		    	</t-hotel-room-list> 
+            	</div>
+            	<div>
+    		    	<t-hotel-details-tab
+    		    		descriptions="[[itinerary.descriptions]]"
+    		    		amenities="[[itinerary.amenities]]"
+    		    		pointsOfInterest="[[itinerary.pointsOfInterest]]">
+    		    	</t-hotel-details-tab>
+            	</div>
+    	    </iron-pages>
+        </template>
 
         <t-hotel-room-list-provider
             id="singleAvailApi"

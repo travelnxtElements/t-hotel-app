@@ -16,7 +16,8 @@
     "t-tabs-v2": "atomelements/t-tabs-v2#^1.0.0",
     "t-policy": "travelnxtelements/t-policy#^1.0.2",
     "iron-pages": "PolymerElements/iron-pages#^1.0.4",
-    "t-hotel-room-list": "travelnxtelements/t-hotel-room-list#^1.0.4"
+    "t-hotel-room-list": "travelnxtelements/t-hotel-room-list#^1.0.4",
+    "iron-flex-layout": "PolymerElements/iron-flex-layout#^1.2.1",
   },
   "devDependencies": {
     "iron-component-page": "PolymerElements/iron-component-page#^1.0.0",

@@ -2,8 +2,13 @@
 <link rel="import" href="../t-sessionstorage/t-sessionstorage.html">
 <link rel="import" href="../t-list/t-list.html">
 <link rel="import" href="../t-notify/t-notify.html">
-<link rel="import" href="../t-search-overlay/t-search-overlay.html">
-<link rel="import" href="../t-header/t-header-search-recap.html">
+<link rel="import" href="../iron-icon/iron-icon.html">
+<link rel="import" href="../t-tabs-v2/t-tabs.html">
+<link rel="import" href="../t-hotel-room-list/t-hotel-room-policy-provider.html">
+<link rel="import" href="../t-hotel-room-list/t-hotel-room-list.html">
+<link rel="import" href="../t-hotel-room-list/t-hotel-details-tab.html">
+<link rel="import" href="../t-hotel-room-list/t-hotel-room-list-provider.html">
+<link rel="import" href="../iron-pages/iron-pages.html">
 <link rel="import" href="../t-text-container/travel-element-styles.html">
 <link rel="import" href="../t-behavior/t-page-behavior.html">
 <link rel="import" href="../t-behavior/t-session-behavior.html"/>
@@ -35,6 +40,66 @@ Example:
 
         <content></content>
 
+        <t-image-carousel
+	        light-box
+	        loading-icon="maps:hotel"
+	        data="{{carouselData}}" 
+	        height="200">
+	    </t-image-carousel>
+
+        <div class="section-small">
+	        <div class="font-16 primary-text margin-bottom">{{itinerary.name}}</div>
+	        <a class="layout horizontal start link-style font-12 margin-bottom" href="{{mapPageUrl}}" style="margin-left: -2px;">
+	            <iron-icon class="icon-star" icon="maps:place"></iron-icon>&nbsp;
+	            <span>{{itinerary.address}}</span>
+	        </a>
+	        <div class="layout horizontal">
+	            <template is="dom-repeat" items="{{iconArray}}" >
+	                <iron-icon class="icon-star" icon="star"></iron-icon>
+	            </template>
+	        </div>
+    	</div>
+
+	    <t-tabs 
+	    	selected="{{activeTab}}" 
+	    	noink 
+	    	inverted 
+	    	alignment="fullbleed">
+	        <t-tab>Rooms</t-tab>
+	        <t-tab>Details</t-tab>    
+	    </t-tabs>
+
+    	<iron-pages selected="{{activeTab}}">
+        	<div>
+		        <t-hotel-room-list
+		        	rooms="[[itinerary.rooms]]"
+		        	stayDuration="{{itinerary.stayDuration}}">
+		        	<t-hotel-room-policy-provider
+		        		id="policyProvider">
+		        	</t-hotel-room-policy-provider>     
+		    	</t-hotel-room-list> 
+        	</div>
+        	<div>
+		    	<t-hotel-details-tab
+		    		descriptions="[[itinerary.descriptions]]"
+		    		amenities="[[itinerary.amenities]]"
+		    		pointsOfInterest="[[itinerary.pointsOfInterest]]">
+		    	</t-hotel-details-tab>
+        	</div>
+	    </iron-pages>
+
+        <t-hotel-room-list-provider
+            id="singleAvailApi"
+			api-base-url="[[apiBaseUrl]]"
+			api-relative-url="api/hotel/results/single"
+			auth-token="[[authToken]]"
+            loading="{{loading}}"
+            search-id="[[searchId]]"
+            inventory-id="[[itinerary.id]]"
+            on-t-hotel-room-provider-success="_onSingleAvailSuccess"
+            on-t-hotel-room-provider-failure="_onSingleAvailError">
+        </t-hotel-room-list-provider>
+
         <t-sessionstorage
             id="sessionStore"
             api-url-format="[[apiUrlFormat]]"
@@ -55,14 +120,24 @@ Example:
                 ],
 
                 properties: {
+
+	                /*
+	                 * <p>This property holds the value of selected date of selected room</p>
+	                 */
+	                selectedRoom: {
+	                    type: Object,
+	                    notify: true
+	                },
                 },
 
                 observers: [
                     '__pageLoad(visible)',
-                    '__updatePage(searchId)'
+                    '__updatePage(itineraryId)'
                 ],
 
-                listeners: {
+                listeners: {,
+                    'session-get-complete': '_updateItineraryId',
+                    'on-room-select': '_onRoomSelect'
                 },
 
                 /**
@@ -79,17 +154,18 @@ Example:
                     this._syncSession();
                 },
 
-                __updatePage: function (searchId) {
+                __updatePage: function (itineraryId) {
 
-                    if (!searchId) {
+                    if (!itineraryId) {
                         this.fire('go-to-search');
                         return;
                     }
 
-                    this.$.loadingOverlay.active = true;
-                    this.$.loadingOverlay.value = 0;
-                    this.$.list.generateList();
-                    this.$.list.$.filter.generateFilter();
+                    this.$.singleAvailApi.singleAvail();
+                },
+
+                _updateItineraryId: function () {
+                    this.itineraryId = this.itinerary.id;
                 },
 
                 _syncSession: function () {
@@ -99,38 +175,49 @@ Example:
                     },{
                         key: 'Hotel_Search_Id',
                         propertyName: 'searchId'
+                    }, {
+                        key: 'Hotel_Itinerary',
+                        propertyName: 'itinerary'
                     }];
                     this.getSession();
                 },
 
-                /**
-                 * This is observer method and executed when list is populated in `t-list`
-                 * @return {Void}
-                 */
-                _onListPopulation: function () {
-                    //ending the overlay
-                    this.$.loadingOverlay.value = 100;
-                },
-
-                _onHotelSelection: function (e) {
+                _onSingleAvailSuccess: function () {
                     if (!e || !e.detail) {
                         return;
                     }
 
-                    if (!this.itinerary || (this.itinerary.id !== e.detail.id)) {
+                    this.itinerary = e.detail.response.inventory;
 
-                        this.itinerary = e.detail;
+                    this._data = [{
+                        key: 'Hotel_Itinerary',
+                        propertyName: 'itinerary',
+                        value: this.itinerary
+                    }];
+
+                    this.setSession();
+
+                	debugger;
+                },
+
+                _onSingleAvailError: function () {
+                	debugger;                	
+                },
+
+                _onRoomSelect: function (e) {
+                    if (e.detail) {
+
+                        this.selectedRoom = e.detail;
 
                         this._data = [{
-                            key: 'Hotel_Itinerary',
-                            propertyName: 'itinerary',
-                            value: this.itinerary
+                            key: 'Hotel_Room',
+                            value: e.detail
                         }];
 
                         this.setSession();
-                    }
 
-                    this.fire('hotel-select', this.itinerary);
+                        this.fire('room-selected', this.selectedRoom);
+                    }
                 }
             });
         })();

@@ -95,9 +95,9 @@ Example:
 			auth-token="[[authToken]]"
             loading="{{loading}}"
             search-id="[[searchId]]"
-            inventory-id="[[itinerary.id]]"
-            on-t-hotel-room-provider-success="_onSingleAvailSuccess"
-            on-t-hotel-room-provider-failure="_onSingleAvailError">
+            itinerary-id="[[itinerary.id]]"
+            on-t-hotel-room-list-provider-success="_onSingleAvailSuccess"
+            on-t-hotel-room-list-provider-error="_onSingleAvailError">
         </t-hotel-room-list-provider>
 
         <t-sessionstorage
@@ -135,7 +135,7 @@ Example:
                     '__updatePage(itineraryId)'
                 ],
 
-                listeners: {,
+                listeners: {
                     'session-get-complete': '_updateItineraryId',
                     'on-room-select': '_onRoomSelect'
                 },
@@ -182,12 +182,12 @@ Example:
                     this.getSession();
                 },
 
-                _onSingleAvailSuccess: function () {
+                _onSingleAvailSuccess: function (e) {
                     if (!e || !e.detail) {
                         return;
                     }
 
-                    this.itinerary = e.detail.response.inventory;
+                    this.itinerary = e.detail.inventory;
 
                     this._data = [{
                         key: 'Hotel_Itinerary',
@@ -200,7 +200,7 @@ Example:
                 	debugger;
                 },
 
-                _onSingleAvailError: function () {
+                _onSingleAvailError: function (e) {
                 	debugger;                	
                 },
 

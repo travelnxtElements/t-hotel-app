@@ -79,14 +79,11 @@ Example:
                 api-base-url="[[apiBaseUrl]]"
                 site-logo-url="[[siteLogoUrl]]"
                 api-url-format="[[apiUrlFormat]]"
-                filter-icon="bgv:filter"
-                disable-filter-icon="bgv:disable-filter"
                 hotel-icon="[[hotelIcon]]"
-                hotel-recap-data="[[hotelRecapData]]"
                 search-id="[[searchId]]"
                 search-criteria="{{searchCriteria}}"
                 itinerary="{{selectedItinerary}}"
-                on-hotel-select="_goToRoomList">
+                on-room-selected="_goToDetailsPage">
                 <t-header 
                     icon="[[headerBackIcon]]" 
                     url="[[siteUrl]]hotel/results">
@@ -228,7 +225,10 @@ Example:
                 _goToSearch: function (e) {
                     this.set('route.path', 'home');
                     //Patch ATOM-911 to resize the tab underline
-                    document.querySelector('#home-tabs paper-tabs').notifyResize();
+                    var paperTab = document.querySelector('#home-tabs paper-tabs');
+                    if (paperTab) {
+                        paperTab.notifyResize();
+                    }
                 },
 
                 _goToResults: function (e) {
@@ -237,6 +237,10 @@ Example:
 
                 _goToRoomList: function (e) {
                     this.set('route.path', 'rooms');
+                },
+
+                _goToDetailsPage: function (e) {
+                    this.set('route.path', 'details');
                 },
 
                 _goToPassengerInfo: function (e) {

@@ -48,9 +48,9 @@ Example:
 
         <t-list 
             id="list"
-            data-api="[[apiBaseUrl]]api/hotel/results/[[searchId]]/rates?$top=20&token=[[authToken]]&$select=Id,Name,Rating,Address,StayDuration,Deal,IsPostPaid,MinFare,Fare,HeroImageUrl,Source"
+            data-api="[[apiBaseUrl]]api/hotel/results/[[searchId]]/rates?$top=20&token=[[authToken]]&$select=Id,Name,Rating,Address,StayDuration,Deal,IsPostPaid,MinFare,Fare,HeroImageUrl,Source,PhotoUrls"
             filter-api="[[apiBaseUrl]]api/hotel/filter/[[searchId]]/rates?token=[[authToken]]"
-            filter-results-api="[[apiBaseUrl]]api/hotel/results/filter/[[searchId]]/rates?$top=20&token=[[authToken]]&$select=Id,Name,Rating,Address,StayDuration,Deal,IsPostPaid,MinFare,Fare,HeroImageUrl,Source"
+            filter-results-api="[[apiBaseUrl]]api/hotel/results/filter/[[searchId]]/rates?$top=20&token=[[authToken]]&$select=Id,Name,Rating,Address,StayDuration,Deal,IsPostPaid,MinFare,Fare,HeroImageUrl,Source,PhotoUrls"
             with-filter
             with-sorting
             filter-search-label="[[filterSearchLabel]]"
@@ -99,7 +99,7 @@ Example:
                      */
                     hotelIcon: {
                         type: String,
-                        value: 'places:pool'
+                        value: 'maps:hotel'
                     },
 
                     hotelRecapData: {

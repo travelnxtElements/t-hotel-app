@@ -83,6 +83,15 @@ Example:
 	        </div>
     	</div>
 
+        <t-tabs 
+            selected="{{activeTab}}" 
+            noink 
+            inverted 
+            alignment="fullbleed">
+            <t-tab>Rooms</t-tab>
+            <t-tab>Details</t-tab>    
+        </t-tabs>
+
         <template is="dom-if" if="[[loading]]">
             <div class="loader-section section-small" id="loaderContainer">
                 <p class="primary-text text-center margin-bottom-medium">
@@ -95,15 +104,6 @@ Example:
         </template>
 
         <template is="dom-if" if="[[!loading]]">
-    	    <t-tabs 
-    	    	selected="{{activeTab}}" 
-    	    	noink 
-    	    	inverted 
-    	    	alignment="fullbleed">
-    	        <t-tab>Rooms</t-tab>
-    	        <t-tab>Details</t-tab>    
-    	    </t-tabs>
-
         	<iron-pages selected="{{activeTab}}">
             	<div>
     		        <t-hotel-room-list

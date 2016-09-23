@@ -7,7 +7,9 @@
 <link rel="import" href="../t-behavior/t-session-behavior.html"/>
 <link rel="import" href="../t-faredetails/t-faredetails.html"/>
 <link rel="import" href="../t-button/t-button.html">
+<link rel="import" href="../t-hotel-itinerary-details/t-hotel-itinerary-details.html">
 <link rel="import" href="../t-car-itinerary-details/t-shopping-cart-remove-all-api.html">
+<link rel="import" href="../t-car-itinerary-details/t-shopping-cart-add-item-api.html">
 
 <!--
 A comment describing this element
@@ -40,11 +42,11 @@ Example:
 
         <content></content>
 
-		<t-hotel-itinerary-details
-			itinerary="[[itinerary]]"
-			selected-room="[[selectedRoom]]"
-			hotel-icon="[[hotelIcon]]">			
-		</t-hotel-itinerary-details>
+        <t-hotel-itinerary-details
+            itinerary="[[itinerary]]"
+            selected-room="[[selectedRoom]]"
+            hotel-icon="[[hotelIcon]]">         
+        </t-hotel-itinerary-details>
 
         <t-faredetails
             id="fareDetails"
@@ -110,20 +112,20 @@ Example:
 
                 properties: {
 
-	                /*
-	                 * <p>This property holds the value of selected date of selected room</p>
-	                 */
-	                selectedRoom: {
-	                    type: Object,
-	                    notify: true
-	                },
+                    /*
+                     * <p>This property holds the value of selected date of selected room</p>
+                     */
+                    selectedRoom: {
+                        type: Object,
+                        notify: true
+                    },
 
                     /*
                      * <p>This holds value of hotel rating array</p>
                      */
-	                ratingList: {
-	                	type: Array
-	                },
+                    ratingList: {
+                        type: Array
+                    },
 
                     /*
                      * This holds the value of default hotel icon
@@ -131,7 +133,7 @@ Example:
                     hotelIcon: {
                         type: String,
                         value: 'maps:hotel'
-                    }
+                    },
 
                     /*
                      * This holds the value of selected room id
@@ -153,7 +155,7 @@ Example:
 
                 /**
                  * This is observer method and executed every time `visible` or `searchId` changes
-                 * @param  	{String} visible
+                 * @param   {String} visible
                  * @param  {String} searchId
                  * @return {Void}
                  */
@@ -182,7 +184,6 @@ Example:
                 },
 
                 _updateRoomId: function () {
-                	this._populateRatings();
                     this.roomId = this.selectedRoom.id;
                 },
 

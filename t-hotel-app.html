@@ -2,6 +2,7 @@
 <link rel="import" href="../t-hotel-search/t-hotel-search-page.html">
 <link rel="import" href="t-hotel-result-page.html">
 <link rel="import" href="t-hotel-room-list-page.html">
+<link rel="import" href="t-hotel-itinerary-details-page.html">
 <link rel="import" href="../t-header/t-hotel-search-decorator.html">
 
 <!--
@@ -81,8 +82,9 @@ Example:
                 api-url-format="[[apiUrlFormat]]"
                 hotel-icon="[[hotelIcon]]"
                 search-id="[[searchId]]"
-                search-criteria="{{searchCriteria}}"
+                search-criteria="[[searchCriteria]]"
                 itinerary="{{selectedItinerary}}"
+                selected-room="{{selectedRoom}}"
                 on-room-selected="_goToDetailsPage">
                 <t-header 
                     icon="[[headerBackIcon]]" 
@@ -98,6 +100,33 @@ Example:
                     </t-hotel-search-decorator>
                 </t-header>
             </t-hotel-room-list-page>
+
+            <t-hotel-itinerary-details-page
+                name="details"
+                auth-token="[[authToken]]" 
+                api-base-url="[[apiBaseUrl]]"
+                site-logo-url="[[siteLogoUrl]]"
+                api-url-format="[[apiUrlFormat]]"
+                hotel-icon="[[hotelIcon]]"
+                search-id="[[searchId]]"
+                search-criteria="[[searchCriteria]]"
+                itinerary="{{selectedItinerary}}"
+                selected-room="{{selectedRoom}}"
+                on-pricing-success="_goToPassengerInfo">
+                <t-header 
+                    icon="[[headerBackIcon]]" 
+                    url="[[siteUrl]]hotel/rooms">
+                    <t-header-search-recap 
+                        recap-data="{{hotelRecapData}}" 
+                        hide-edit-icon 
+                        itinerary-name="[[selectedItinerary.name]]">                            
+                    </t-header-search-recap>
+                    <t-hotel-search-decorator
+                        input="[[searchCriteria]]"
+                        output="{{hotelRecapData}}">
+                    </t-hotel-search-decorator>
+                </t-header>
+            </t-hotel-itinerary-details-page>
 
         </iron-pages>
     </template>

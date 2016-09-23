@@ -1,3 +1,14 @@
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../t-sessionstorage/t-sessionstorage.html">
+<link rel="import" href="../t-notify/t-notify.html">
+<link rel="import" href="../iron-flex-layout/iron-flex-layout-classes.html">
+<link rel="import" href="../t-text-container/travel-element-styles.html">
+<link rel="import" href="../t-behavior/t-page-behavior.html">
+<link rel="import" href="../t-behavior/t-session-behavior.html"/>
+<link rel="import" href="../t-faredetails/t-faredetails.html"/>
+<link rel="import" href="../t-button/t-button.html">
+<link rel="import" href="../t-car-itinerary-details/t-shopping-cart-remove-all-api.html">
+
 <!--
 A comment describing this element
 
@@ -13,19 +24,242 @@ Example:
 
 @demo demo/index.html
 -->
-
 <dom-module id="t-hotel-itinerary-details-page">
-	<template>
-		<style>
-			:host {
-				display: block;
-			}
-		</style>
-		
-	</template>
-	<script>
-		Polymer({
-			is: 't-hotel-itinerary-details-page'
-		});
-	</script>
+    <template>
+        <style include="iron-flex"></style>
+        <style include="iron-flex-alignment"></style>
+        <style include="travel-element-styles">
+            :host {
+                display: block;
+                font-family: var(--header-font-family, --primary-font-family);
+                font-size: var(--font-14, 14px);
+            }
+        </style>
+
+        <t-notify id="notify"></t-notify>
+
+        <content></content>
+
+		<t-hotel-itinerary-details
+			itinerary="[[itinerary]]"
+			selected-room="[[selectedRoom]]"
+			hotel-icon="[[hotelIcon]]">			
+		</t-hotel-itinerary-details>
+
+        <t-faredetails
+            id="fareDetails"
+            is-collapsible
+            error="{{pricingFailed}}"
+            show-points
+            fare-change="[[cartItem.fareChange]]"
+            data="[[selectedRoom.fare.components]]" 
+            passenger-details="[[passengerDetails]]"
+            base-fare-label="[[baseFareLabel]]"
+            itinerary-fare-label="[[itineraryFareLabel]]">
+        </t-faredetails>
+
+        <div class="horizontal layout section-small">
+            <t-button 
+                id="btnContinue" 
+                class="primary flex" 
+                disabled 
+                noink 
+                label="Continue Booking" 
+                on-tap="onBtnContinueClick">                    
+            </t-button>
+        </div>
+
+        <t-shopping-cart-remove-all-api
+            id="removeCartApi" 
+            loading="{{loading}}"
+            api-base-url="[[apiBaseUrl]]" 
+            api-relative-url="api/ShoppingCart/remove/all" 
+            auth-token="[[authToken]]"
+            on-t-shopping-cart-remove-all-api-success="_onRemoveCartSuccess"
+            on-t-shopping-cart-remove-all-api-error="_onRemoveCartError">
+        </t-shopping-cart-remove-all-api>
+
+        <t-shopping-cart-add-item-api
+            id="addCartApi" 
+            loading="{{loading}}" 
+            api-base-url="[[apiBaseUrl]]"
+            api-relative-url="api/ShoppingCart/add" 
+            auth-token="[[authToken]]"
+            on-t-shopping-cart-add-item-api-success="_onAddCartSuccess"
+            on-t-shopping-cart-add-item-api-error="_onAddCartError">
+        </t-shopping-cart-add-item-api>
+
+        <t-sessionstorage
+            id="sessionStore"
+            api-url-format="[[apiUrlFormat]]"
+            on-t-sessionstorage-load-success="_onSessionGet"
+            on-t-sessionstorage-save-success="_onSessionSave">
+        </t-sessionstorage>
+    </template>
+    <script>
+        (function () {
+
+            Polymer({
+
+                is: 't-hotel-itinerary-details-page',
+
+                behaviors: [
+                    TravelNxt.Behaviors.PageBehavior,
+                    TravelNxt.Behaviors.SessionBehavior
+                ],
+
+                properties: {
+
+	                /*
+	                 * <p>This property holds the value of selected date of selected room</p>
+	                 */
+	                selectedRoom: {
+	                    type: Object,
+	                    notify: true
+	                },
+
+                    /*
+                     * <p>This holds value of hotel rating array</p>
+                     */
+	                ratingList: {
+	                	type: Array
+	                },
+
+                    /*
+                     * This holds the value of default hotel icon
+                     */
+                    hotelIcon: {
+                        type: String,
+                        value: 'maps:hotel'
+                    }
+
+                    /*
+                     * This holds the value of selected room id
+                     */
+                    roomId: {
+                        type: String
+                    }
+                },
+
+                observers: [
+                    '__pageLoad(visible)',
+                    '__updatePage(roomId)'
+                ],
+
+                listeners: {
+                    'session-get-complete': '_updateRoomId',
+                    'room-select': '_onRoomSelect'
+                },
+
+                /**
+                 * This is observer method and executed every time `visible` or `searchId` changes
+                 * @param  	{String} visible
+                 * @param  {String} searchId
+                 * @return {Void}
+                 */
+                __pageLoad: function (visible) {
+                    if (!visible) {
+                        return;
+                    }
+
+                    this._syncSession();
+                },
+
+                __updatePage: function (roomId) {
+
+                    if (!roomId) {
+                        this.fire('go-to-search');
+                        return;
+                    }
+
+                    this.$.fareDetails.data = null;
+                    this.$.fareDetails.$.loaderContainer.hidden = false;
+                    this.$.fareDetails.error = false;
+
+                    this.$.btnContinue.disabled = true;
+
+                    this.$.removeCartApi.remove();
+                },
+
+                _updateRoomId: function () {
+                	this._populateRatings();
+                    this.roomId = this.selectedRoom.id;
+                },
+
+                _syncSession: function () {
+                    this._data = [{
+                        key: 'Hotel_Search_Criteria',
+                        propertyName: 'searchCriteria'
+                    },{
+                        key: 'Hotel_Search_Id',
+                        propertyName: 'searchId'
+                    }, {
+                        key: 'Hotel_Itinerary',
+                        propertyName: 'itinerary'
+                    },{
+                        key: 'Hotel_Room',
+                        propertyName: 'selectedRoom'
+                    }];
+                    this.getSession();
+                },
+
+                /*
+                 * success callback handler for `t-shopping-cart-remove-all-api` component
+                */
+                _onRemoveCartSuccess: function (e) {
+                    this.$.addCartApi.add({ 
+                        itemInfos: [{
+                            searchId: this.searchId,    
+                            inventoryId: this.itinerary.id
+                        }] 
+                    });
+                },
+
+                /*
+                 * error callback handler for `t-shopping-cart-remove-all-api` component
+                */
+                _onRemoveCartError: function (e) {
+                    this.$.fareDetails.error = true;
+                },
+
+
+                _onAddCartSuccess: function (e) {
+                    
+                    if (!e.detail.addToCartItemResult || !e.detail.addToCartItemResult.length) {
+                        this.$.fareDetails.error = true;
+                        throw Error('failed to add itinerary in the cart!');
+                    }
+
+                    this.itinerary = e.detail.inventory;
+
+                    //detect fare change
+                    this.fareChange = e.detail.addToCartItemResult[0].fareChange;
+
+                    this._data = [{
+                        key: 'Hotel_Itinerary',
+                        propertyName: 'itinerary',
+                        value: e.detail.inventory
+                    }];
+
+                    this.setSession();
+                    
+                    this.$.btnContinue.disabled = false;
+                },
+
+                _onAddCartError: function (e) {
+                    this.$.fareDetails.error = true;
+                },
+
+                /*
+                 * continue button tap event handler
+                */
+                onBtnContinueClick: function () {
+                    if (this.$.btnContinue.disabled) {
+                        return;
+                    }
+                    this.fire('pricing-success');
+                }
+            });
+        })();
+    </script>
 </dom-module>

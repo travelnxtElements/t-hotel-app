@@ -10,6 +10,7 @@
 <link rel="import" href="../t-hotel-itinerary-details/t-hotel-itinerary-details.html">
 <link rel="import" href="../t-car-itinerary-details/t-shopping-cart-remove-all-api.html">
 <link rel="import" href="../t-car-itinerary-details/t-shopping-cart-add-item-api.html">
+<link rel="import" href="../t-shared-lib/t-date-behavior.html">
 
 <!--
 A comment describing this element
@@ -45,7 +46,10 @@ Example:
         <t-hotel-itinerary-details
             itinerary="[[itinerary]]"
             selected-room="[[selectedRoom]]"
-            hotel-icon="[[hotelIcon]]">         
+            hotel-icon="[[hotelIcon]]"
+            api-base-url="[[apiBaseUrl]]"
+            auth-token="[[authToken]]"
+            search-id="[[searchId]]">
         </t-hotel-itinerary-details>
 
         <t-faredetails
@@ -53,11 +57,9 @@ Example:
             is-collapsible
             error="{{pricingFailed}}"
             show-points
-            fare-change="[[cartItem.fareChange]]"
+            fare-change="[[fareChange]]"
             data="[[selectedRoom.fare.components]]" 
-            passenger-details="[[passengerDetails]]"
-            base-fare-label="[[baseFareLabel]]"
-            itinerary-fare-label="[[itineraryFareLabel]]">
+            passenger-details="[[paxCountMap]]">
         </t-faredetails>
 
         <div class="horizontal layout section-small">
@@ -67,7 +69,7 @@ Example:
                 disabled 
                 noink 
                 label="Continue Booking" 
-                on-tap="onBtnContinueClick">                    
+                on-tap="_onBtnContinueClick">                    
             </t-button>
         </div>
 
@@ -107,7 +109,8 @@ Example:
 
                 behaviors: [
                     TravelNxt.Behaviors.PageBehavior,
-                    TravelNxt.Behaviors.SessionBehavior
+                    TravelNxt.Behaviors.SessionBehavior,
+                    TravelNxt.Behaviors.DateBehavior
                 ],
 
                 properties: {
@@ -211,7 +214,7 @@ Example:
                     this.$.addCartApi.add({ 
                         itemInfos: [{
                             searchId: this.searchId,    
-                            inventoryId: this.itinerary.id
+                            inventoryId: this.selectedRoom.id
                         }] 
                     });
                 },
@@ -231,15 +234,24 @@ Example:
                         throw Error('failed to add itinerary in the cart!');
                     }
 
-                    this.itinerary = e.detail.inventory;
+                    this.itinerary = e.detail.addToCartItemResult[0].inventory;
+
+                    this.selectedRoom = this.itinerary.rooms.find(function (item) {
+                        return item.id === this.selectedRoom.id;
+                    }, this);
 
                     //detect fare change
                     this.fareChange = e.detail.addToCartItemResult[0].fareChange;
+                    this._setFareDetails();
 
                     this._data = [{
                         key: 'Hotel_Itinerary',
                         propertyName: 'itinerary',
-                        value: e.detail.inventory
+                        value: this.itinerary
+                    },{
+                        key: 'Hotel_Room',
+                        propertyName: 'selectedRoom',
+                        value: this.selectedRoom
                     }];
 
                     this.setSession();
@@ -252,9 +264,34 @@ Example:
                 },
 
                 /*
+                 * translator method to set view components data
+                */
+                _setFareDetails: function () {
+                    if (!this.itinerary || !this.searchCriteria) {
+                        return;
+                    }
+
+                    this.paxCountMap = [{ 
+                        type: "Adult", 
+                        quantity: this.searchCriteria.adultCount 
+                    }];
+
+                    if (this.searchCriteria.childCount > 0) {
+                        this.paxCountMap.push({ 
+                            type: "Child", 
+                            quantity: this.searchCriteria.childCount 
+                        });
+                    }
+
+                    var nights = this._dateDiff(this.itinerary.stayDuration.start.date, this.itinerary.stayDuration.end.date);
+
+                    this.$.fareDetails.itineraryFareLabel = nights + (nights > 1 ? " Nights Fare" : " Night Fare");
+                    this.$.fareDetails.baseFareLabel = "Avg. per night fare x " + nights;
+                },
+                /*
                  * continue button tap event handler
                 */
-                onBtnContinueClick: function () {
+                _onBtnContinueClick: function () {
                     if (this.$.btnContinue.disabled) {
                         return;
                     }

@@ -82,7 +82,7 @@ Example:
                 api-url-format="[[apiUrlFormat]]"
                 hotel-icon="[[hotelIcon]]"
                 search-id="[[searchId]]"
-                search-criteria="[[searchCriteria]]"
+                search-criteria="{{searchCriteria}}"
                 itinerary="{{selectedItinerary}}"
                 selected-room="{{selectedRoom}}"
                 on-room-selected="_goToDetailsPage">
@@ -111,20 +111,13 @@ Example:
                 search-id="[[searchId]]"
                 search-criteria="[[searchCriteria]]"
                 itinerary="{{selectedItinerary}}"
-                selected-room="{{selectedRoom}}"
+                selected-room="[[selectedRoom]]"
                 on-pricing-success="_goToPassengerInfo">
                 <t-header 
                     icon="[[headerBackIcon]]" 
-                    url="[[siteUrl]]hotel/rooms">
-                    <t-header-search-recap 
-                        recap-data="{{hotelRecapData}}" 
-                        hide-edit-icon 
-                        itinerary-name="[[selectedItinerary.name]]">                            
-                    </t-header-search-recap>
-                    <t-hotel-search-decorator
-                        input="[[searchCriteria]]"
-                        output="{{hotelRecapData}}">
-                    </t-hotel-search-decorator>
+                    url="[[siteUrl]]hotel/rooms"
+                    label="Review Itinerary"
+                    normal-heading>
                 </t-header>
             </t-hotel-itinerary-details-page>
 

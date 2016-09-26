@@ -1,4 +1,6 @@
 <link rel="import" href="../polymer/polymer.html"/>
+<link rel="import" href="../t-sessionstorage/t-sessionstorage.html">
+<link rel="import" href="../t-behavior/t-session-behavior.html"/>
 <link rel="import" href="../t-hotel-search/t-hotel-search-page.html">
 <link rel="import" href="t-hotel-result-page.html">
 <link rel="import" href="t-hotel-room-list-page.html">
@@ -32,7 +34,13 @@ Example:
                 --header-recap-line-height: 16px;
             }
         </style>
-        <t-notify id="notify" message="No results found." type="warn"></t-notify>
+
+        <t-notify 
+            id="notify" 
+            message="No results found." 
+            type="warn">                
+        </t-notify>
+
         <app-route
             id="hotelRoute"
             route="{{route}}" 
@@ -40,6 +48,7 @@ Example:
             data="{{routeData}}"
             tail="{{subroute}}">
         </app-route>
+
         <iron-pages role="main" selected="{{page}}" attr-for-selected="name" selected-attribute="visible">
 
             <t-hotel-search-page
@@ -121,6 +130,25 @@ Example:
                 </t-header>
             </t-hotel-itinerary-details-page>
 
+            <t-passenger-info-page
+                name="paxInfo"
+                session-key="Hotel"
+                primary-header="Primary Guest"
+                api-url-format="[[apiUrlFormat]]"
+                constructor-obj="[[paxCountMap]]"
+                passenger-count="{{passengerCount}}"
+                passenger-details="{{passengerDetails}}"
+                hide-gender
+                on-passenger-save-success="_goToPaymentPage">
+                <div class="t-header">
+                    <t-header
+                        icon="[[headerBackIcon]]"
+                        url="[[siteUrl]]hotel/details"
+                        label="Guest Info"
+                        normal-heading>
+                    </t-header>
+                </div>
+            </t-passenger-info-page>
         </iron-pages>
     </template>
     <script>
@@ -128,6 +156,10 @@ Example:
 
             Polymer({
                 is: 't-hotel-app',
+
+                behaviors: [
+                    TravelNxt.Behaviors.SessionBehavior
+                ],
 
                 properties: {
 
@@ -161,8 +193,7 @@ Example:
                     },
 
                     selectedItinerary: {
-                        type: Object,
-                        observer: '__updateDetails'
+                        type: Object
                     },
 
                     headerBackIcon: {
@@ -178,7 +209,8 @@ Example:
                 },
 
                 observers: [
-                    '__routePageChanged(route.path)'
+                    '__routePageChanged(route.path)',
+                    '__paxMappingChanged(searchCriteria.adultCount, searchCriteria.childCount)'
                 ],
 
                 __routePageChanged: function (path) {
@@ -206,26 +238,50 @@ Example:
                     }.bind(this), 10);
                 },
 
-                __updateDetails: function () {
-                    this.paxCountMap = this.paxCountMap || {
-                        Adult: 1
+                __paxMappingChanged: function (adultCount, childCount) {
+                    if (!adultCount) {
+                        return;
+                    }
+
+                    var paxCount = {
+                        email:'',
+                        phone:'',
+                        passengerList:[]
                     };
-                    this.passengerInfo = this.passengerInfo || {
-                        passengerList: [
-                            {
+
+                    if (parseInt(adultCount) > 0) {
+                        for (var i = 1; i <= adultCount; i++) {
+                            paxCount.passengerList.push({
                                 title: "",
                                 type: "Adult",
                                 firstName: "",
                                 lastName: "",
-                                header: ""
-                            }
-                        ],
-                        phone: "",
-                        email: ""
-                    };
-                    this.itineraryId = this.selectedItinerary && this.selectedItinerary.id
-                        ? this.selectedItinerary.id
-                        : 0;
+                                header: "Adult " + i
+                            });
+                        }
+                    }
+
+                    if (childCount && parseInt(childCount) > 0) {
+                        for (var i = 1; i <= childCount; i++) {
+                            paxCount.passengerList.push({
+                                title: "",
+                                type: "Child",
+                                firstName: "",
+                                lastName: "",
+                                header: "Child "+ i
+                            });
+                        }
+                    }
+
+                    this.passengerCount = paxCount;
+
+                    this._data = [{
+                        key: 'Hotel_Passenger_Count',
+                        propertyName: 'passengerCount',
+                        value: this.passengerCount
+                    }];
+
+                    this.setSession();
                 },
 
                 //function to trigger event for setting header data

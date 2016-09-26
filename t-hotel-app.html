@@ -150,6 +150,13 @@ Example:
                 </div>
             </t-passenger-info-page>
         </iron-pages>
+
+        <t-sessionstorage
+            id="sessionStore"
+            api-url-format="[[apiUrlFormat]]"
+            on-t-sessionstorage-load-success="_onSessionGet"
+            on-t-sessionstorage-save-success="_onSessionSave">
+        </t-sessionstorage>
     </template>
     <script>
         (function () {

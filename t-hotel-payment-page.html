@@ -443,6 +443,10 @@
                         childAges: this.searchCriteria.childAges
                     }        
                 },
+
+                _bookItinerary: function (e) {
+                    this.$.bookApi.book(e.detail.value);
+                },
             
                 /*
                  * This is the event handler for payment button click
@@ -458,7 +462,6 @@
                         this.$.submit.disabled = true;
                         this._showFullPageLoader = true;
                         this._getBookingData();
-                        this.$.bookApi.book(this.bookRequest);
                     }
                 },
                 

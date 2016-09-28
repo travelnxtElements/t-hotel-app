@@ -6,6 +6,8 @@
 <link rel="import" href="t-hotel-room-list-page.html">
 <link rel="import" href="t-hotel-itinerary-details-page.html">
 <link rel="import" href="t-hotel-payment-page.html">
+<link rel="import" href="../t-confirmation-page/t-hotel-confirmation-page.html">
+<link rel="import" href="../t-confirmation-page/t-confirmation-failure-page.html">
 <link rel="import" href="../t-header/t-hotel-search-decorator.html">
 
 <!--
@@ -163,7 +165,6 @@ Example:
                 booked-itinerary="{{bookedResponse}}"
                 selected-room="[[selectedRoom]]"
                 passenger-info="{{passengerDetails}}"
-                option-id="[[selectedOption.id]]"
                 header-back-icon="[[headerBackIcon]]"
                 stay-on-page
                 preselect-country="US"
@@ -176,6 +177,41 @@ Example:
                     normal-heading>
                 </t-header>
             </t-hotel-payment-page>
+
+            <t-hotel-confirmation-page
+                name="confirmation"
+                success-icon="[[successIcon]]"
+                api-base-url="[[apiBaseUrl]]"
+                hotel-icon="[[hotelIcon]]"
+                auth-token="[[authToken]]"
+                selected-Room="[[selectedRoom]]"
+                header-back-icon="[[headerBackIcon]]"
+                booked-itinerary="[[bookedItinerary]]"
+                booked-response="{{bookedResponse}}"
+                api-url-format="[[apiUrlFormat]]">
+                <t-header
+                    icon="home"
+                    on-left-button-click="_goToSearch"
+                    label="Confirmation"
+                    normal-heading>
+                </t-header>
+            </t-hotel-confirmation-page>
+
+            <t-confirmation-failure-page
+                name="failure"
+                hotel-icon="[[hotelIcon]]"
+                api-url-format="[[apiUrlFormat]]"
+                home-page-url="[[siteUrl]]hotel/"
+                results-page-url="[[siteUrl]]hotel/rooms"
+                details-page-url="[[siteUrl]]hotel/details"
+                customer-care-number="[[customerCareNumber]]">
+                <t-header
+                    icon="home"
+                    url="[[siteUrl]]hotel/"
+                    label="Confirmation"
+                    normal-heading>
+                </t-header>
+            </t-confirmation-failure-page>
         </iron-pages>
 
         <t-sessionstorage

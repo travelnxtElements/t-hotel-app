@@ -19,7 +19,8 @@
     "t-hotel-room-list": "travelnxtelements/t-hotel-room-list#^1.0.4",
     "t-hotel-itinerary-details": "travelnxtelements/t-hotel-itinerary-details#master",
     "iron-flex-layout": "PolymerElements/iron-flex-layout#^1.2.1",
-    "t-hotel-translator": "travelnxtelements/t-hotel-translator#master"
+    "t-hotel-translator": "travelnxtelements/t-hotel-translator#master",
+    "t-confirmation-page": "travelnxtelements/t-confirmation-page#^1.0.24"
   },
   "devDependencies": {
     "iron-component-page": "PolymerElements/iron-component-page#^1.0.0",

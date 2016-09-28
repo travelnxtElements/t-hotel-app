@@ -214,6 +214,11 @@ Example:
             </t-confirmation-failure-page>
         </iron-pages>
 
+        <t-activity-confirmation-decorator
+            input="[[bookedResponse]]"
+            output="{{bookedItinerary}}">
+        </t-activity-confirmation-decorator>
+
         <t-sessionstorage
             id="sessionStore"
             api-url-format="[[apiUrlFormat]]"

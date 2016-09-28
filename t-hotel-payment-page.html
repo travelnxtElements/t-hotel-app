@@ -16,6 +16,7 @@
 <link rel="import" href="../t-behavior/t-page-behavior.html">
 <link rel="import" href="../t-behavior/t-session-behavior.html"/>
 <link rel="import" href="../t-hotel-itinerary-details/t-hotel-itinerary-details.html">
+<link rel="import" href="../t-hotel-translator/t-hotel-book-translator.html">
 
 <!--
     <h3>Details:</h3>
@@ -168,10 +169,10 @@
             on-t-car-book-api-error="_onBookError">
         </t-car-book-api>
         
-        <t-activity-book-translator
+        <t-hotel-book-translator
             input="[[bookRequest]]"
             on-output-changed="_bookItinerary">                
-        </t-activity-book-translator>
+        </t-hotel-book-translator>
         
         <t-sessionstorage
             id="sessionStore"
@@ -195,7 +196,6 @@
                     TravelNxt.Behaviors.PageLoadBehavior,
                     TravelNxt.Behaviors.DateBehavior,
                     TravelNxt.Behaviors.PageBehavior,
-                    TravelNxt.Behaviors.ActivityPageBehavior,
                     TravelNxt.Behaviors.SessionBehavior
                 ],
 
@@ -267,28 +267,37 @@
                     }
 
                     this._syncSession();
-
                 },
 
                 /*
                  * <p>this method gets called when page becomes visible</p>
                  * <p>`go-to-search` event is fired if `bookedItinerary` property is not set.</p>
                 */
-                _updatePage: function (visible) {
+                _updatePage: function () {
 
                     this.$.notify.active = false;
 
                     this.$.acceptance.checked = false;
                     
-                    if (visible && (!this.passengerInfo  || !this.selectedRoom || !this.itinerary || !this.searchCriteria)) {
+                    if (this.visible && (!this.passengerInfo  || !this.selectedRoom || !this.itinerary || !this.searchCriteria)) {
                         this.fire('go-to-search');
                         return;
                     }
 
-                    //sets passenger count mapping
-                    this._setPaxDetails();
-
                     this._setViewDetails();
+                },
+
+
+                /*
+                 * Sets all the view data
+                */
+                _setViewDetails: function () {
+
+                    if (this.$$('#address')) {
+                        this._countryCall();
+                    }
+
+                    this._setFareDetails();                    
                 },
 
                 /*
@@ -302,6 +311,32 @@
                     this.$$('#address').pullCountryList();
                     this.$$('#address').$.phoneNumber.value = this.passengerInfo.phone;
                     this.$$('#creditCard').$.securityCode.value = '';
+                },
+
+                /*
+                 * <p>This is a translator method to set fare details data</p>
+                */
+                _setFareDetails: function () {
+                    if (!this.itinerary || !this.searchCriteria) {
+                        return;
+                    }
+
+                    this.paxCountMap = [{ 
+                        type: "Adult", 
+                        quantity: this.searchCriteria.adultCount 
+                    }];
+
+                    if (this.searchCriteria.childCount > 0) {
+                        this.paxCountMap.push({ 
+                            type: "Child", 
+                            quantity: this.searchCriteria.childCount 
+                        });
+                    }
+
+                    var nights = this._dateDiff(this.itinerary.stayDuration.start.date, this.itinerary.stayDuration.end.date);
+
+                    this.$.fareDetails.itineraryFareLabel = nights + (nights > 1 ? " Nights Fare" : " Night Fare");
+                    this.$.fareDetails.baseFareLabel = "Avg. per night fare x " + nights;                    
                 },
 
                 /*
@@ -324,27 +359,6 @@
                 },
 
                 /*
-                 * <p>This is a translator method to set fare details data</p>
-                */
-                _setFareDetails: function (baseFareLabel) {
-                    if (!this.itinerary || !this.searchCriteria) {
-                        return;
-                    }
-
-                    var formattedDate = this._getDateComponents(this.searchCriteria.pickupDate);
-                    var pickupDate = formattedDate.date + ' ' + formattedDate.shortMonth + ' ' + this.searchCriteria.pickupTime;
-
-                    formattedDate = this._getDateComponents(this.searchCriteria.dropoffDate);
-                    var dropoffDate = formattedDate.date + ' ' + formattedDate.shortMonth + ' ' + this.searchCriteria.dropoffTime;
-
-                    this.$.fareDetails.baseFareLabel = baseFareLabel + this._dateDiff(pickupDate, dropoffDate);
-
-                    if (this.itinerary.fare && this.itinerary.fare.components) {
-                        this.$.fareDetails.data = this.itinerary.fare.components;
-                    }
-                },
-
-                /*
                  * <p>handler for booking message timer calculation</p>
                 */
                 _bindTimer: function () {
@@ -362,41 +376,6 @@
                     if (e.srcElement.tagName.toLowerCase() !== 'a') {
                         this.checked = !this.checked;
                     }
-                },
-                /*
-                 * This method validated payment page information
-                */
-                validate: function () {
-                    if (this.$.submit.disabled) {
-                        return false;
-                    }
-                    if (this.itinerary.isPostPaid) {
-                        return true;
-                    }
-                    var isValid = true;
-                    isValid = this.$$('#address').validate() && isValid;
-                    return this.$$('#creditCard').validate() && isValid;
-                },
-            
-                /*
-                 * This is the event handler for payment button click
-                */
-                bookNow: function () {
-
-                    this._bindTimer();
-
-                    this.$.notify.active = false;
-                    this.stayOnPage = true;
-
-                    if (this.validate()) {
-                        this.$.submit.disabled = true;
-                        this._showFullPageLoader = true;
-                        this._getBookingData();
-                    }
-                },
-
-                _bookItinerary: function (e) {
-                    this.$.bookApi.book(e.detail.value);
                 },
 
                 /*
@@ -432,87 +411,9 @@
                     this.fire('book-error');
                 },
 
-
                 /*
-                 * Sets all the view data
+                 * Get required session data
                 */
-                _setViewDetails: function () {
-
-                    if (this.$$('#address')) {
-                        this._countryCall();
-                    }
-
-                    this._setFareDetails();                    
-                },
-
-                /*
-                * translator method to set view components data
-                * This method overrides behavior implementation
-                */
-                _setFareDetails: function () {
-                    if (!this.itinerary || !this.searchCriteria) {
-                        return;
-                    }
-
-                    if (this.itinerary.fare && this.itinerary.fare.components) {
-                        this.$.fareDetails.data = this.itinerary.fare.components.filter(function (item) {
-                            return item.type.toLowerCase() !== 'basefare';
-                        });
-
-                        this._buildFareComponents();
-                    }
-                },
-
-                /*
-                 * Builds fare components to include passenger-wise prices as per passenger counts provided while pricing
-                */
-                _buildFareComponents: function () {
-                    if (!this.itinerary.options || !this.itinerary.options.length) {
-                        return;
-                    }
-
-                    this._passengerFares = [];
-
-                    var paxInfo = this.selectedRoom.passengerTypesInfo;
-
-                    var passengerFares = [];
-
-                    for (var i = 0; i < paxInfo.length; i++) {
-
-                        if (paxInfo[i].passengerType.toLowerCase() === 'youth') {
-                            continue;
-                        }
-
-                        var baseFare = paxInfo[i].fare.components.find(function (item) {
-                            return item.type.toLowerCase() === 'basefare';
-                        });
-
-                        if (!baseFare || !this.paxCountMap || !this.paxCountMap.length) {
-                            continue;
-                        }
-
-                        var passenger = this.paxCountMap.find(function (item) {
-                            return item.type.toLowerCase() === paxInfo[i].passengerType.toLowerCase();
-                        });
-
-                        if (!passenger || !passenger.count) {
-                            continue;
-                        }
-
-                        passenger = parseInt(passenger.count);
-
-                        if (passenger) {
-                            passengerFares.push({
-                                label: paxInfo[i].multiplePassengerType + ' x ' + passenger,
-                                fare: (baseFare.money.amount * passenger).toFixed(2),
-                                currency: baseFare.money.currency
-                            });
-                        }
-                    }
-
-                    this._passengerFares = passengerFares;
-                },
-
                 _syncSession: function () {
                     this._data = [{
                         key: 'Hotel_Search_Criteria',
@@ -538,8 +439,42 @@
                     this.bookRequest = {
                         itinerary: this.itinerary,
                         passengerInfo: this.passengerInfo,
-                        payment: this._getCreditCardInfo()
+                        payment: this._getCreditCardInfo(),
+                        childAges: this.searchCriteria.childAges
                     }        
+                },
+            
+                /*
+                 * This is the event handler for payment button click
+                */
+                bookNow: function () {
+
+                    this._bindTimer();
+
+                    this.$.notify.active = false;
+                    this.stayOnPage = true;
+
+                    if (this.validate()) {
+                        this.$.submit.disabled = true;
+                        this._showFullPageLoader = true;
+                        this._getBookingData();
+                        this.$.bookApi.book(this.bookRequest);
+                    }
+                },
+                
+                /*
+                 * This method validated payment page information
+                */
+                validate: function () {
+                    if (this.$.submit.disabled) {
+                        return false;
+                    }
+                    if (this.itinerary.isPostPaid) {
+                        return true;
+                    }
+                    var isValid = true;
+                    isValid = this.$$('#address').validate() && isValid;
+                    return this.$$('#creditCard').validate() && isValid;
                 }
             });
         })();

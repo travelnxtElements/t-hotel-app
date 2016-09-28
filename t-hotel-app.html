@@ -5,6 +5,7 @@
 <link rel="import" href="t-hotel-result-page.html">
 <link rel="import" href="t-hotel-room-list-page.html">
 <link rel="import" href="t-hotel-itinerary-details-page.html">
+<link rel="import" href="t-hotel-payment-page.html">
 <link rel="import" href="../t-header/t-hotel-search-decorator.html">
 
 <!--
@@ -149,6 +150,32 @@ Example:
                     </t-header>
                 </div>
             </t-passenger-info-page>
+
+            <t-hotel-payment-page
+                name="payment"
+                api-base-url="[[apiBaseUrl]]"
+                api-url-format="[[apiUrlFormat]]"
+                auth-token="[[authToken]]"
+                hotel-icon="[[hotelIcon]]"
+                search-criteria="[[searchCriteria]]"
+                payment-timer="[[paymentTimer]]"
+                itinerary="[[selectedItinerary]]"
+                booked-itinerary="{{bookedResponse}}"
+                selected-room="[[selectedRoom]]"
+                passenger-info="{{passengerDetails}}"
+                option-id="[[selectedOption.id]]"
+                header-back-icon="[[headerBackIcon]]"
+                stay-on-page
+                preselect-country="US"
+                on-book-success="_goToConfirmationPage"
+                on-book-error="_goToFailurePage">
+                <t-header
+                    icon="[[headerBackIcon]]"
+                    url="[[siteUrl]]hotel/paxInfo"
+                    label="Make Payment"
+                    normal-heading>
+                </t-header>
+            </t-hotel-payment-page>
         </iron-pages>
 
         <t-sessionstorage

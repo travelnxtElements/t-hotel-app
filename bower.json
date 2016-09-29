@@ -5,13 +5,8 @@
   "dependencies": {
     "polymer": "Polymer/polymer#^1.4.0",
     "t-hotel-search": "travelnxtelements/t-hotel-search#^1.0.16",
-    "t-hotel-result-page": "travelnxtelements/t-hotel-result-page#master",
-    "t-hotel-room-list-page": "travelnxtelements/t-hotel-room-list-page#master",
-    "t-hotel-itinerary-details-page": "travelnxtelements/t-hotel-itinerary-details-page#master",
     "t-sessionstorage": "travelnxtelements/t-sessionstorage#^1.0.3",
     "t-behavior": "travelnxtelements/t-behavior#^1.0.1",
-    "t-hotel-payment-page": "travelnxtelements/t-hotel-payment-page",
-    "t-hotel-confirmation-page": "travelnxtelements/t-hotel-confirmation-page",
     "t-confirmation-page": "travelnxtelements/t-confirmation-page#^1.0.26",
     "t-header": "travelnxtelements/t-header#^1.5.11",
     "t-notify": "atomelements/t-notify#^1.1.1",

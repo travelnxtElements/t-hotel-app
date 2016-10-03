@@ -74,7 +74,7 @@ Example:
                 search-criteria="{{searchCriteria}}"
                 itinerary="{{selectedItinerary}}"
                 on-hotel-select="_goToRoomList">
-                <t-header icon="[[headerBackIcon]]" url="[[siteUrl]]hotel/" right-icon="maps:place">
+                <t-header icon="[[headerBackIcon]]" url="[[siteUrl]]hotel/" right-icon="maps:place" on-right-button-click="_goToResultMap">
                     <t-header-search-recap recap-data="{{hotelRecapData}}"></t-header-search-recap>
                     <t-hotel-search-decorator
                         input="[[searchCriteria]]"
@@ -82,6 +82,28 @@ Example:
                     </t-hotel-search-decorator>
                 </t-header>
             </t-hotel-result-page>
+
+            <t-hotel-map-page
+                name="results-map"
+                auth-token="[[authToken]]" 
+                api-base-url="[[apiBaseUrl]]"
+                site-logo-url="[[siteLogoUrl]]"
+                api-url-format="[[apiUrlFormat]]"
+                filter-icon="bgv:filter"
+                disable-filter-icon="bgv:disable-filter"
+                hotel-icon="[[hotelIcon]]"
+                search-id="[[searchId]]"
+                search-criteria="{{searchCriteria}}"
+                on-hotel-select="_goToRoomList"
+                google-map-key="AIzaSyBO0mGEsECssz9TLXWdApFWdGnQrr7unFg">
+                <t-header icon="[[headerBackIcon]]" url="[[siteUrl]]hotel/" right-icon="bgv:list" on-right-button-click="_goToResults">
+                    <t-header-search-recap recap-data="{{hotelRecapData}}"></t-header-search-recap>
+                    <t-hotel-search-decorator
+                        input="[[searchCriteria]]"
+                        output="{{hotelRecapData}}">
+                    </t-hotel-search-decorator>
+                </t-header>
+            </t-hotel-map-page>
 
             <t-hotel-room-list-page
                 name="rooms"
@@ -384,6 +406,10 @@ Example:
 
                 _goToResults: function (e) {
                     this.set('route.path', 'results');
+                },
+
+                _goToResultMap: function () {
+                    this.set('route.path', 'results-map');
                 },
 
                 _goToRoomList: function (e) {

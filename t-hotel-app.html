@@ -84,7 +84,7 @@ Example:
             </t-hotel-result-page>
 
             <t-hotel-map-page
-                name="results-map"
+                name="resultsMap"
                 auth-token="[[authToken]]" 
                 api-base-url="[[apiBaseUrl]]"
                 site-logo-url="[[siteLogoUrl]]"
@@ -94,6 +94,7 @@ Example:
                 hotel-icon="[[hotelIcon]]"
                 search-id="[[searchId]]"
                 search-criteria="{{searchCriteria}}"
+                itinerary="{{selectedItinerary}}"
                 on-hotel-select="_goToRoomList"
                 google-map-key="AIzaSyBO0mGEsECssz9TLXWdApFWdGnQrr7unFg">
                 <t-header icon="[[headerBackIcon]]" url="[[siteUrl]]hotel/" right-icon="bgv:list" on-right-button-click="_goToResults">
@@ -409,7 +410,7 @@ Example:
                 },
 
                 _goToResultMap: function () {
-                    this.set('route.path', 'results-map');
+                    this.set('route.path', 'resultsMap');
                 },
 
                 _goToRoomList: function (e) {

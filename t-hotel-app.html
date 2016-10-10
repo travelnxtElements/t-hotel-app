@@ -97,7 +97,7 @@ Example:
                 search-criteria="{{searchCriteria}}"
                 itinerary="{{selectedItinerary}}"
                 on-hotel-select="_goToRoomList"
-                google-map-key="AIzaSyBO0mGEsECssz9TLXWdApFWdGnQrr7unFg">
+                google-map-key="[[googleMapKey]]">
                 <t-header icon="[[headerBackIcon]]" url="[[siteUrl]]hotel/" right-icon="bgv:list" on-right-button-click="_goToResults">
                     <t-header-search-recap recap-data="{{hotelRecapData}}"></t-header-search-recap>
                     <t-hotel-search-decorator
@@ -133,6 +133,30 @@ Example:
                     </t-hotel-search-decorator>
                 </t-header>
             </t-hotel-room-list-page>
+
+            <t-hotel-nearby-map-page
+                name="roomListMap"
+                auth-token="[[authToken]]" 
+                api-base-url="[[apiBaseUrl]]"
+                site-logo-url="[[siteLogoUrl]]"
+                api-url-format="[[apiUrlFormat]]"
+                site-url="[[siteUrl]]"
+                filter-icon="bgv:filter"
+                disable-filter-icon="bgv:disable-filter"
+                hotel-icon="[[hotelIcon]]"
+                search-id="[[searchId]]"
+                search-criteria="{{searchCriteria}}"
+                itinerary="[[selectedItinerary]]"
+                marker-path="[[markerPath]]"
+                google-map-key="AIzaSyBO0mGEsECssz9TLXWdApFWdGnQrr7unFg">
+                <t-header style="z-index:3;" icon="[[headerBackIcon]]" url="[[siteUrl]]hotel/" right-icon="bgv:list" on-right-button-click="_goToRoomList">
+                    <t-header-search-recap recap-data="{{hotelRecapData}}"></t-header-search-recap>
+                    <t-hotel-search-decorator
+                        input="[[searchCriteria]]"
+                        output="{{hotelRecapData}}">
+                    </t-hotel-search-decorator>
+                </t-header>
+            </t-hotel-nearby-map-page>
 
             <t-hotel-itinerary-details-page
                 name="details"

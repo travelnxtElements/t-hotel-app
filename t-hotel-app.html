@@ -331,6 +331,7 @@ Example:
 
                 observers: [
                     '__routePageChanged(route.path)',
+                    '__allPassengersInfoRequiredChanged(selectedItinerary.allPassengersInfoRequired)',
                     '__paxMappingChanged(searchCriteria.adultCount, searchCriteria.childCount)'
                 ],
 
@@ -405,6 +406,15 @@ Example:
                     this.setSession();
                 },
 
+                __allPassengersInfoRequiredChanged: function (allPassengersInfoRequired) {
+                    debugger;
+                    if (allPassengersInfoRequired === false) {
+                        this.__paxMappingChanged(1, 0);                        
+                    } else if (allPassengersInfoRequired === true) {
+                        this.__paxMappingChanged(searchCriteria.adultCount, searchCriteria.childCount);
+                    }
+                },
+
                 //function to trigger event for setting header data
                 _setHeaderDataEvent: function (page) {
                     if (this.page.toLowerCase() === 'home') {
@@ -431,6 +441,22 @@ Example:
                 },
 
                 _goToResults: function (e) {
+
+                    this._data = [{
+                        key: 'Hotel_Itinerary',
+                        propertyName: 'selectedItinerary',
+                        value: null
+                    },{
+                        key: 'Hotel_Room',
+                        propertyName: 'selectedRoom',
+                        value: null
+                    },{
+                        key: 'Hotel_Booked_Itinerary',
+                        propertyName: 'bookedResponse',
+                        value: null
+                    }];
+
+                    this.setSession();
                     this.set('route.path', 'results');
                 },
 

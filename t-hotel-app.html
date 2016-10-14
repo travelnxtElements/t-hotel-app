@@ -98,7 +98,7 @@ Example:
                 itinerary="{{selectedItinerary}}"
                 on-hotel-select="_goToRoomList"
                 google-map-key="[[googleMapKey]]">
-                <t-header icon="[[headerBackIcon]]" url="[[siteUrl]]hotel/" right-icon="bgv:list" on-right-button-click="_goToResults">
+                <t-header icon="[[headerBackIcon]]" url="[[siteUrl]]hotel/results" right-icon="bgv:list" on-right-button-click="_goToResults">
                     <t-header-search-recap recap-data="{{hotelRecapData}}"></t-header-search-recap>
                     <t-hotel-search-decorator
                         input="[[searchCriteria]]"
@@ -149,7 +149,7 @@ Example:
                 itinerary="[[selectedItinerary]]"
                 marker-path="[[markerPath]]"
                 google-map-key="AIzaSyBO0mGEsECssz9TLXWdApFWdGnQrr7unFg">
-                <t-header style="z-index:3;" icon="[[headerBackIcon]]" url="[[siteUrl]]hotel/" right-icon="bgv:list" on-right-button-click="_goToRoomList">
+                <t-header style="z-index:3;" icon="[[headerBackIcon]]" url="[[siteUrl]]hotel/rooms" right-icon="bgv:list" on-right-button-click="_goToRoomList">
                     <t-header-search-recap recap-data="{{hotelRecapData}}"></t-header-search-recap>
                     <t-hotel-search-decorator
                         input="[[searchCriteria]]"

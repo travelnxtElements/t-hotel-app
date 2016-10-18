@@ -409,8 +409,8 @@ Example:
                 __allPassengersInfoRequiredChanged: function (allPassengersInfoRequired) {
                     if (allPassengersInfoRequired === false) {
                         this.__paxMappingChanged(1, 0);                        
-                    } else if (allPassengersInfoRequired === true) {
-                        this.__paxMappingChanged(searchCriteria.adultCount, searchCriteria.childCount);
+                    } else if (allPassengersInfoRequired === true && this.searchCriteria) {
+                        this.__paxMappingChanged(this.searchCriteria.adultCount, this.searchCriteria.childCount);
                     }
                 },
 

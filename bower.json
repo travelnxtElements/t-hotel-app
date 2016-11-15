@@ -2,6 +2,7 @@
   "name": "t-hotel-app",
   "description": "hotel search to book flow component",
   "main": "t-hotel-app.html",
+  "version": "0.0.0",
   "dependencies": {
     "polymer": "Polymer/polymer#^1.4.0",
     "t-hotel-search": "travelnxtelements/t-hotel-search#^1.0.16",

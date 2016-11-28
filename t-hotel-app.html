@@ -148,6 +148,7 @@ Example:
                 search-criteria="{{searchCriteria}}"
                 itinerary="[[selectedItinerary]]"
                 marker-path="[[markerPath]]"
+                on-hotel-select="_goToRoomList"
                 google-map-key="AIzaSyBO0mGEsECssz9TLXWdApFWdGnQrr7unFg">
                 <t-header style="z-index:3;" icon="[[headerBackIcon]]" url="[[siteUrl]]hotel/rooms" right-icon="bgv:list" on-right-button-click="_goToRoomList">
                     <t-header-search-recap recap-data="{{hotelRecapData}}"></t-header-search-recap>
